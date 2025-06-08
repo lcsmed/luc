@@ -19,7 +19,10 @@ export async function GET() {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: [
+        { todayOrder: 'asc' },
+        { createdAt: 'desc' }
+      ]
     })
 
     return NextResponse.json(tasks)
