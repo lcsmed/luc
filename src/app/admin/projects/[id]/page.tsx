@@ -218,26 +218,19 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Link
-            href="/admin/projects"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
-          >
-            ← Back to Projects
-          </Link>
-          <div className="flex items-center gap-4 mt-4">
-            <div 
-              className="w-6 h-6 rounded-full"
-              style={{ backgroundColor: project.color }}
-            />
-            <h1 className="text-3xl font-bold">{project.name}</h1>
-          </div>
-          {project.description && (
-            <p className="text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>
-          )}
+    <div>
+      <div className="mb-8">
+        <div className="flex items-center gap-4">
+          <div 
+            className="w-6 h-6 rounded-full"
+            style={{ backgroundColor: project.color }}
+          />
+          <h1 className="text-3xl font-bold">{project.name}</h1>
         </div>
+        {project.description && (
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>
+        )}
+      </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -353,7 +346,6 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
             ))}
           </div>
         </DragDropContext>
-      </div>
     </div>
   )
 }

@@ -28,31 +28,24 @@ export default async function AdminDashboard() {
   })
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <div className="flex gap-4">
-            <Link
-              href="/admin/projects"
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Projects
-            </Link>
-            <Link
-              href="/admin/new"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              New Post
-            </Link>
-            <Link
-              href="/"
-              className="border border-gray-300 dark:border-gray-700 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              View Blog
-            </Link>
-          </div>
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex gap-4">
+          <Link
+            href="/admin/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            New Post
+          </Link>
+          <Link
+            href="/"
+            className="border border-gray-300 dark:border-gray-700 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            View Blog
+          </Link>
         </div>
+      </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -83,7 +76,6 @@ export default async function AdminDashboard() {
             )}
           </div>
         </div>
-      </div>
     </div>
   )
 }
