@@ -4,9 +4,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     
     if (!session?.user?.email) {
@@ -23,7 +24,7 @@ export async function GET(
 
     const post = await prisma.post.findFirst({
       where: {
-        id: params.id,
+        id: id,
         authorId: user.id
       }
     })
@@ -40,9 +41,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     
     if (!session?.user?.email) {
@@ -59,7 +61,7 @@ export async function PUT(
 
     const existingPost = await prisma.post.findFirst({
       where: {
-        id: params.id,
+        id: id,
         authorId: user.id
       }
     })
@@ -72,7 +74,7 @@ export async function PUT(
     const { title, slug, excerpt, content, published } = body
 
     const updatedPost = await prisma.post.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         title,
         slug,
@@ -90,9 +92,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     
     if (!session?.user?.email) {
@@ -109,7 +112,7 @@ export async function DELETE(
 
     const existingPost = await prisma.post.findFirst({
       where: {
-        id: params.id,
+        id: id,
         authorId: user.id
       }
     })
@@ -119,7 +122,7 @@ export async function DELETE(
     }
 
     await prisma.post.delete({
-      where: { id: params.id }
+      where: { id: id }
     })
 
     return NextResponse.json({ success: true })
