@@ -3,11 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 
 interface Project {
   id: string
   name: string
   color: string
+  sidebarOrder?: number
   _count: {
     tasks: number
   }
@@ -55,6 +57,47 @@ export default function Sidebar() {
       ? project.tasks?.filter(task => task.columnId === doneColumn.id).length || 0
       : 0
     return { total: totalTasks, completed: completedTasks }
+  }
+
+  const handleProjectDragEnd = async (result: DropResult) => {
+    if (!result.destination) return
+
+    const { source, destination } = result
+    if (source.index === destination.index) return
+
+    const newProjects = Array.from(projects)
+    const [reorderedProject] = newProjects.splice(source.index, 1)
+    newProjects.splice(destination.index, 0, reorderedProject)
+
+    // Update sidebarOrder for all projects
+    const updatedProjects = newProjects.map((project, index) => ({
+      ...project,
+      sidebarOrder: index
+    }))
+
+    setProjects(updatedProjects)
+
+    // Update order on server
+    try {
+      await fetch('/api/projects/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          projectOrders: updatedProjects.map((project, index) => ({
+            id: project.id,
+            sidebarOrder: index
+          }))
+        })
+      })
+    } catch (error) {
+      console.error('Failed to update project order:', error)
+      // Revert on error
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data)
+      }
+    }
   }
 
   return (
@@ -111,47 +154,76 @@ export default function Sidebar() {
                   + New
                 </Link>
               </div>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {projects.map((project) => {
-                  const { total, completed } = getTaskProgress(project)
-                  const isProjectActive = pathname === `/admin/projects/${project.id}`
-                  
-                  return (
-                    <Link
-                      key={project.id}
-                      href={`/admin/projects/${project.id}`}
-                      className={`block p-3 rounded-lg border transition-colors ${
-                        isProjectActive
-                          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                          : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
-                      }`}
+              <DragDropContext onDragEnd={handleProjectDragEnd}>
+                <Droppable droppableId="sidebar-projects">
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="space-y-2 max-h-64 overflow-y-auto"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <div
-                            className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                            style={{ backgroundColor: project.color }}
-                          />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {project.name}
-                          </span>
-                        </div>
-                      </div>
-                      {total > 0 && (
-                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                          <span>{completed}/{total} tasks</span>
-                          <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
-                            <div
-                              className="bg-green-500 h-1.5 rounded-full transition-all duration-200"
-                              style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </Link>
-                  )
-                })}
-              </div>
+                      {projects.map((project, index) => {
+                        const { total, completed } = getTaskProgress(project)
+                        const isProjectActive = pathname === `/admin/projects/${project.id}`
+                        
+                        return (
+                          <Draggable key={project.id} draggableId={project.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`rounded-lg border transition-all ${
+                                  isProjectActive
+                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                                    : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                                } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                              >
+                                <div className="flex items-center">
+                                  <div
+                                    {...provided.dragHandleProps}
+                                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+                                    title="Drag to reorder"
+                                  >
+                                    ⋮⋮
+                                  </div>
+                                  <Link
+                                    href={`/admin/projects/${project.id}`}
+                                    className="flex-1 p-3 pl-1"
+                                  >
+                                    <div className="flex items-center justify-between mb-2">
+                                      <div className="flex items-center">
+                                        <div
+                                          className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                                          style={{ backgroundColor: project.color }}
+                                        />
+                                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                          {project.name}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    {total > 0 && (
+                                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                        <span>{completed}/{total} tasks</span>
+                                        <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                                          <div
+                                            className="bg-green-500 h-1.5 rounded-full transition-all duration-200"
+                                            style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Link>
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
+                        )
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </div>
           )}
         </nav>

@@ -76,11 +76,22 @@ export async function GET() {
         authorId: user.id
       },
       include: {
-        tasks: true
+        tasks: true,
+        columns: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
+        _count: {
+          select: {
+            tasks: true
+          }
+        }
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: [
+        { sidebarOrder: 'asc' },
+        { createdAt: 'desc' }
+      ]
     })
 
     return NextResponse.json(projects)

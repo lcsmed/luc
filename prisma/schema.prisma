@@ -43,6 +43,7 @@ model Project {
   name          String
   description   String?
   color         String?   @default("#3b82f6")
+  sidebarOrder  Int?
   author        User      @relation(fields: [authorId], references: [id])
   authorId      String
   tasks         Task[]
