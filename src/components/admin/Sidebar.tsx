@@ -45,6 +45,7 @@ export default function Sidebar() {
     { href: '/admin', label: 'Dashboard', icon: '📊' },
     { href: '/admin/posts', label: 'Posts', icon: '📝' },
     { href: '/admin/projects', label: 'Projects', icon: '📋' },
+    { href: '/admin/today', label: 'Today', icon: '📅' },
   ]
 
   const getTaskProgress = (project: Project) => {

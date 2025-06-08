@@ -11,6 +11,7 @@ interface Task {
   description?: string
   order: number
   columnId: string
+  isToday: boolean
   createdAt: string
   updatedAt: string
 }
@@ -294,6 +295,31 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     }
   }
 
+  const toggleTodayStatus = async (taskId: string, currentStatus: boolean) => {
+    if (!project) return
+
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/today`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isToday: !currentStatus })
+      })
+
+      if (response.ok) {
+        setProject({
+          ...project,
+          tasks: project.tasks.map(task => 
+            task.id === taskId 
+              ? { ...task, isToday: !currentStatus }
+              : task
+          )
+        })
+      }
+    } catch (error) {
+      console.error("Error updating task today status:", error)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -427,12 +453,25 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                             >
                               <div className="flex justify-between items-start mb-2">
                                 <h3 className="font-medium text-sm">{task.title}</h3>
-                                <button
-                                  onClick={() => handleDeleteTask(task.id)}
-                                  className="text-gray-400 hover:text-red-500 text-xs"
-                                >
-                                  ×
-                                </button>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => toggleTodayStatus(task.id, task.isToday)}
+                                    className={`p-1 rounded transition-all hover:scale-110 ${
+                                      task.isToday 
+                                        ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' 
+                                        : 'text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                                    }`}
+                                    title={task.isToday ? 'Remove from today' : 'Mark for today'}
+                                  >
+                                    {task.isToday ? '📅' : '🗓️'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="text-gray-400 hover:text-red-500 text-xs"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
                               </div>
                               {task.description && (
                                 <p className="text-gray-600 dark:text-gray-400 text-xs mb-2">
