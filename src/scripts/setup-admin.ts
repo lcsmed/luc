@@ -2,8 +2,8 @@ import { prisma } from '../lib/prisma'
 import bcrypt from 'bcryptjs'
 
 async function setupAdmin() {
-  const email = process.env.ADMIN_EMAIL || 'admin@itmol.com'
-  const password = process.env.ADMIN_PASSWORD || 'changeMe123!'
+  const email = process.env.ADMIN_EMAIL || 'lucsam@lucsam.com'
+  const password = process.env.ADMIN_PASSWORD || 'Mindfulness123!'
   const name = process.env.ADMIN_NAME || 'Admin'
 
   try {

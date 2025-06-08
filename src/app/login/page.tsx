@@ -44,7 +44,7 @@ export default function LoginPage() {
           <Link href="/" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
             ← Back to blog
           </Link>
-          <h2 className="mt-6 text-3xl font-bold">Sign in to itmol</h2>
+          <h2 className="mt-6 text-3xl font-bold">Sign in to luc sam</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Access your admin dashboard
           </p>

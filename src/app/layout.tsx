@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "itmol",
+  title: "luc sam",
   description: "My personal space for thoughts and ideas",
 };
 

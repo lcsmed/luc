@@ -1,4 +1,4 @@
-# itmol - Personal Blog
+# luc sam - Personal Blog
 
 A minimalist personal blog built with Next.js, featuring a secure admin panel for posting from anywhere in the world.
 
@@ -30,7 +30,7 @@ First, create a new repository on GitHub and push your code.
 1. Import your GitHub repository to Vercel
 2. Add the following environment variables:
    - `DATABASE_URL` - Your Vercel Postgres connection string
-   - `NEXTAUTH_URL` - Your production URL (e.g., https://itmol.vercel.app)
+   - `NEXTAUTH_URL` - Your production URL (e.g., https://luc-sam.vercel.app)
    - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
 
 ### 4. Initialize Database

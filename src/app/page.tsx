@@ -15,7 +15,7 @@ export default async function Home() {
     <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <header className="mb-16">
-          <h1 className="text-4xl font-bold mb-4">itmol</h1>
+          <h1 className="text-4xl font-bold mb-4">luc sam</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
             My personal space for thoughts and ideas
           </p>

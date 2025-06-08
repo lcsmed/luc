@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "setup:admin": "tsx src/scripts/setup-admin.ts"
+    "setup:admin": "tsx src/scripts/setup-admin.ts",
+    "update:admin": "tsx src/scripts/update-admin.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
