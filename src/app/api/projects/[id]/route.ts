@@ -29,9 +29,13 @@ export async function GET(
         authorId: user.id
       },
       include: {
+        columns: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
         tasks: {
           orderBy: [
-            { status: 'asc' },
             { order: 'asc' },
             { createdAt: 'asc' }
           ]
@@ -96,7 +100,14 @@ export async function PUT(
 
     const updatedProject = await prisma.project.findUnique({
       where: { id: id },
-      include: { tasks: true }
+      include: { 
+        columns: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
+        tasks: true 
+      }
     })
 
     return NextResponse.json(updatedProject)

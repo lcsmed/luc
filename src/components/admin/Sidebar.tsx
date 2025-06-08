@@ -12,7 +12,11 @@ interface Project {
     tasks: number
   }
   tasks: Array<{
-    status: string
+    columnId: string
+  }>
+  columns: Array<{
+    id: string
+    name: string
   }>
 }
 
@@ -45,7 +49,10 @@ export default function Sidebar() {
 
   const getTaskProgress = (project: Project) => {
     const totalTasks = project._count?.tasks || project.tasks?.length || 0
-    const completedTasks = project.tasks?.filter(task => task.status === 'DONE').length || 0
+    const doneColumn = project.columns?.find(col => col.name === 'Done')
+    const completedTasks = doneColumn 
+      ? project.tasks?.filter(task => task.columnId === doneColumn.id).length || 0
+      : 0
     return { total: totalTasks, completed: completedTasks }
   }
 

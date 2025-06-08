@@ -30,7 +30,21 @@ export async function POST(request: Request) {
         name: name.trim(),
         description: description?.trim() || null,
         color: color || "#3b82f6",
-        authorId: user.id
+        authorId: user.id,
+        columns: {
+          create: [
+            { name: "To Do", order: 0 },
+            { name: "In Progress", order: 1 },
+            { name: "Done", order: 2 }
+          ]
+        }
+      },
+      include: {
+        columns: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
       }
     })
 

@@ -5,16 +5,21 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 
-type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE'
-type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
-
 interface Task {
   id: string
   title: string
   description?: string
-  status: TaskStatus
-  priority: TaskPriority
   order: number
+  columnId: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface Column {
+  id: string
+  name: string
+  order: number
+  tasks?: Task[]
   createdAt: string
   updatedAt: string
 }
@@ -24,33 +29,38 @@ interface Project {
   name: string
   description?: string
   color: string
+  columns: Column[]
   tasks: Task[]
   createdAt: string
   updatedAt: string
 }
 
-const STATUS_COLUMNS = {
-  TODO: { title: 'To Do', bgColor: 'bg-gray-50 dark:bg-gray-800' },
-  IN_PROGRESS: { title: 'In Progress', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
-  DONE: { title: 'Done', bgColor: 'bg-green-50 dark:bg-green-900/20' }
+const getColumnBgColor = (index: number) => {
+  const colors = [
+    'bg-gray-50 dark:bg-gray-800',
+    'bg-blue-50 dark:bg-blue-900/20',
+    'bg-green-50 dark:bg-green-900/20',
+    'bg-purple-50 dark:bg-purple-900/20',
+    'bg-yellow-50 dark:bg-yellow-900/20'
+  ]
+  return colors[index % colors.length]
 }
 
-const PRIORITY_COLORS = {
-  LOW: 'bg-gray-400',
-  MEDIUM: 'bg-blue-400', 
-  HIGH: 'bg-orange-400',
-  URGENT: 'bg-red-400'
-}
 
 export default function ProjectKanbanPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showNewTaskForm, setShowNewTaskForm] = useState<TaskStatus | null>(null)
+  const [showNewTaskForm, setShowNewTaskForm] = useState<string | null>(null)
   const [newTaskTitle, setNewTaskTitle] = useState("")
   const [newTaskDescription, setNewTaskDescription] = useState("")
-  const [newTaskPriority, setNewTaskPriority] = useState<TaskPriority>("MEDIUM")
   const [projectId, setProjectId] = useState<string | null>(null)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [editedName, setEditedName] = useState("")
+  const [showNewColumnForm, setShowNewColumnForm] = useState(false)
+  const [newColumnName, setNewColumnName] = useState("")
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null)
+  const [editedColumnName, setEditedColumnName] = useState("")
 
   const fetchProject = useCallback(async () => {
     if (!projectId) return
@@ -84,6 +94,102 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     }
   }, [projectId, fetchProject])
 
+  const handleRenameProject = async () => {
+    if (!project || !editedName.trim() || editedName === project.name) {
+      setIsEditingName(false)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editedName })
+      })
+
+      if (response.ok) {
+        setProject({ ...project, name: editedName })
+        setIsEditingName(false)
+      }
+    } catch (error) {
+      console.error("Error renaming project:", error)
+      setEditedName(project.name)
+      setIsEditingName(false)
+    }
+  }
+
+  const startEditingName = () => {
+    if (project) {
+      setEditedName(project.name)
+      setIsEditingName(true)
+    }
+  }
+
+  const handleCreateColumn = async () => {
+    if (!newColumnName.trim() || !projectId) return
+
+    try {
+      const response = await fetch('/api/columns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newColumnName,
+          projectId: projectId
+        })
+      })
+
+      if (response.ok) {
+        setNewColumnName("")
+        setShowNewColumnForm(false)
+        fetchProject()
+      }
+    } catch (error) {
+      console.error("Error creating column:", error)
+    }
+  }
+
+  const handleRenameColumn = async (columnId: string) => {
+    if (!editedColumnName.trim()) {
+      setEditingColumnId(null)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/columns/${columnId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editedColumnName })
+      })
+
+      if (response.ok) {
+        setEditingColumnId(null)
+        fetchProject()
+      }
+    } catch (error) {
+      console.error("Error renaming column:", error)
+      setEditingColumnId(null)
+    }
+  }
+
+  const handleDeleteColumn = async (columnId: string) => {
+    if (!confirm("Are you sure you want to delete this column? All tasks must be moved first.")) return
+
+    try {
+      const response = await fetch(`/api/columns/${columnId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        fetchProject()
+      } else {
+        const error = await response.json()
+        alert(error.error || "Failed to delete column")
+      }
+    } catch (error) {
+      console.error("Error deleting column:", error)
+    }
+  }
+
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !project) return
 
@@ -98,15 +204,15 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     
     if (!taskToMove) return
 
-    // Update task status if moved to different column
-    const newStatus = destination.droppableId as TaskStatus
-    const updatedTask = { ...taskToMove, status: newStatus }
+    // Update task column if moved to different column
+    const newColumnId = destination.droppableId
+    const updatedTask = { ...taskToMove, columnId: newColumnId }
 
     // Remove task from original position
     const filteredTasks = newTasks.filter(task => task.id !== draggableId)
     
     // Get tasks in the destination column
-    const destinationTasks = filteredTasks.filter(task => task.status === newStatus)
+    const destinationTasks = filteredTasks.filter(task => task.columnId === newColumnId)
     
     // Insert at new position
     destinationTasks.splice(destination.index, 0, updatedTask)
@@ -117,7 +223,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     })
 
     // Combine all tasks
-    const otherTasks = filteredTasks.filter(task => task.status !== newStatus)
+    const otherTasks = filteredTasks.filter(task => task.columnId !== newColumnId)
     const finalTasks = [...otherTasks, ...destinationTasks]
 
     setProject({ ...project, tasks: finalTasks })
@@ -128,7 +234,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          status: newStatus,
+          columnId: newColumnId,
           order: destination.index
         })
       })
@@ -139,7 +245,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     }
   }
 
-  const handleCreateTask = async (status: TaskStatus) => {
+  const handleCreateTask = async (columnId: string) => {
     if (!newTaskTitle.trim() || !project || !projectId) return
 
     try {
@@ -149,8 +255,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
         body: JSON.stringify({
           title: newTaskTitle,
           description: newTaskDescription,
-          priority: newTaskPriority,
-          status,
+          columnId,
           projectId: projectId
         })
       })
@@ -163,7 +268,6 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
         })
         setNewTaskTitle("")
         setNewTaskDescription("")
-        setNewTaskPriority("MEDIUM")
         setShowNewTaskForm(null)
       }
     } catch (error) {
@@ -211,9 +315,9 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     )
   }
 
-  const getTasksByStatus = (status: TaskStatus) => {
+  const getTasksByColumn = (columnId: string) => {
     return project.tasks
-      .filter(task => task.status === status)
+      .filter(task => task.columnId === columnId)
       .sort((a, b) => a.order - b.order)
   }
 
@@ -225,7 +329,31 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
             className="w-6 h-6 rounded-full"
             style={{ backgroundColor: project.color }}
           />
-          <h1 className="text-3xl font-bold">{project.name}</h1>
+          {isEditingName ? (
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={handleRenameProject}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRenameProject()
+                if (e.key === 'Escape') {
+                  setEditedName(project.name)
+                  setIsEditingName(false)
+                }
+              }}
+              className="text-3xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 outline-none px-1"
+              autoFocus
+            />
+          ) : (
+            <h1 
+              className="text-3xl font-bold cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+              onClick={startEditingName}
+              title="Click to rename"
+            >
+              {project.name}
+            </h1>
+          )}
         </div>
         {project.description && (
           <p className="text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>
@@ -233,24 +361,60 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
       </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Object.entries(STATUS_COLUMNS).map(([status, config]) => (
-              <div key={status} className={`${config.bgColor} rounded-lg p-4`}>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-semibold text-lg">{config.title}</h2>
-                  <span className="text-sm text-gray-500 bg-white dark:bg-gray-700 px-2 py-1 rounded">
-                    {getTasksByStatus(status as TaskStatus).length}
-                  </span>
+          <div className={`grid grid-cols-1 gap-6 ${
+            project.columns.length <= 3 ? 'md:grid-cols-' + project.columns.length : 'md:grid-cols-3 lg:grid-cols-4'
+          }`}>
+            {project.columns.map((column, columnIndex) => (
+              <div key={column.id} className={`${getColumnBgColor(columnIndex)} rounded-lg p-4`}>
+                <div className="flex justify-between items-center mb-4 group">
+                  {editingColumnId === column.id ? (
+                    <input
+                      type="text"
+                      value={editedColumnName}
+                      onChange={(e) => setEditedColumnName(e.target.value)}
+                      onBlur={() => handleRenameColumn(column.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleRenameColumn(column.id)
+                        if (e.key === 'Escape') setEditingColumnId(null)
+                      }}
+                      className="font-semibold text-lg bg-transparent border-b border-gray-400 outline-none"
+                      autoFocus
+                    />
+                  ) : (
+                    <h2 
+                      className="font-semibold text-lg cursor-pointer"
+                      onDoubleClick={() => {
+                        setEditingColumnId(column.id)
+                        setEditedColumnName(column.name)
+                      }}
+                    >
+                      {column.name}
+                    </h2>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 bg-white dark:bg-gray-700 px-2 py-1 rounded">
+                      {getTasksByColumn(column.id).length}
+                    </span>
+                    {project.columns.length > 1 && (
+                      <button
+                        onClick={() => handleDeleteColumn(column.id)}
+                        className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 text-sm transition-opacity"
+                        title="Delete column"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <Droppable droppableId={status}>
+                <Droppable droppableId={column.id}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className="space-y-3 min-h-[200px]"
                     >
-                      {getTasksByStatus(status as TaskStatus).map((task, index) => (
+                      {getTasksByColumn(column.id).map((task, index) => (
                         <Draggable key={task.id} draggableId={task.id} index={index}>
                           {(provided, snapshot) => (
                             <div
@@ -271,15 +435,11 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                                 </button>
                               </div>
                               {task.description && (
-                                <p className="text-gray-600 dark:text-gray-400 text-xs mb-3">
+                                <p className="text-gray-600 dark:text-gray-400 text-xs mb-2">
                                   {task.description}
                                 </p>
                               )}
-                              <div className="flex justify-between items-center">
-                                <div 
-                                  className={`w-3 h-3 rounded-full ${PRIORITY_COLORS[task.priority]}`}
-                                  title={task.priority}
-                                />
+                              <div className="flex justify-end">
                                 <span className="text-xs text-gray-400">
                                   {new Date(task.createdAt).toLocaleDateString()}
                                 </span>
@@ -293,7 +453,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                   )}
                 </Droppable>
 
-                {showNewTaskForm === status ? (
+                {showNewTaskForm === column.id ? (
                   <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
                     <input
                       type="text"
@@ -307,21 +467,11 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                       placeholder="Description (optional)"
                       value={newTaskDescription}
                       onChange={(e) => setNewTaskDescription(e.target.value)}
-                      className="w-full p-2 border rounded text-sm mb-2 h-20 dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-2 border rounded text-sm mb-3 h-20 dark:bg-gray-700 dark:border-gray-600"
                     />
-                    <select
-                      value={newTaskPriority}
-                      onChange={(e) => setNewTaskPriority(e.target.value as TaskPriority)}
-                      className="w-full p-2 border rounded text-sm mb-3 dark:bg-gray-700 dark:border-gray-600"
-                    >
-                      <option value="LOW">Low Priority</option>
-                      <option value="MEDIUM">Medium Priority</option>
-                      <option value="HIGH">High Priority</option>
-                      <option value="URGENT">Urgent</option>
-                    </select>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleCreateTask(status as TaskStatus)}
+                        onClick={() => handleCreateTask(column.id)}
                         className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
                       >
                         Add Task
@@ -336,7 +486,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                   </div>
                 ) : (
                   <button
-                    onClick={() => setShowNewTaskForm(status as TaskStatus)}
+                    onClick={() => setShowNewTaskForm(column.id)}
                     className="w-full mt-4 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
                   >
                     + Add task
@@ -344,6 +494,52 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             ))}
+            
+            {/* New Column Form */}
+            {showNewColumnForm ? (
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                <h3 className="font-semibold mb-3">New Column</h3>
+                <input
+                  type="text"
+                  placeholder="Column name"
+                  value={newColumnName}
+                  onChange={(e) => setNewColumnName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCreateColumn()
+                    if (e.key === 'Escape') {
+                      setNewColumnName("")
+                      setShowNewColumnForm(false)
+                    }
+                  }}
+                  className="w-full p-2 border rounded text-sm mb-3 dark:bg-gray-700 dark:border-gray-600"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCreateColumn}
+                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                  >
+                    Create
+                  </button>
+                  <button
+                    onClick={() => {
+                      setNewColumnName("")
+                      setShowNewColumnForm(false)
+                    }}
+                    className="text-gray-600 px-3 py-1 text-sm hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowNewColumnForm(true)}
+                className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 flex items-center justify-center min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+              >
+                <span className="text-gray-500 dark:text-gray-400">+ Add Column</span>
+              </button>
+            )}
           </div>
         </DragDropContext>
     </div>

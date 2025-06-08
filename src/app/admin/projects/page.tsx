@@ -26,7 +26,15 @@ export default async function ProjectsPage() {
       tasks: {
         select: {
           id: true,
-          status: true
+          columnId: true
+        }
+      },
+      columns: {
+        where: {
+          name: 'Done'
+        },
+        select: {
+          id: true
         }
       }
     },
@@ -67,13 +75,11 @@ export default async function ProjectsPage() {
             </div>
           ) : (
             projects.map((project) => {
-              const taskCounts = project.tasks.reduce((acc, task) => {
-                acc[task.status] = (acc[task.status] || 0) + 1
-                return acc
-              }, {} as Record<string, number>)
-
               const totalTasks = project.tasks.length
-              const completedTasks = taskCounts.DONE || 0
+              const doneColumnId = project.columns[0]?.id
+              const completedTasks = doneColumnId 
+                ? project.tasks.filter(task => task.columnId === doneColumnId).length
+                : 0
 
               return (
                 <Link
@@ -118,17 +124,6 @@ export default async function ProjectsPage() {
                         </div>
                       </div>
 
-                      <div className="flex justify-between mt-4 text-xs text-gray-500 dark:text-gray-400">
-                        <span>
-                          To Do: {taskCounts.TODO || 0}
-                        </span>
-                        <span>
-                          In Progress: {taskCounts.IN_PROGRESS || 0}
-                        </span>
-                        <span>
-                          Done: {taskCounts.DONE || 0}
-                        </span>
-                      </div>
 
                       <div className="mt-4 text-xs text-gray-400">
                         Created {new Date(project.createdAt).toLocaleDateString()}

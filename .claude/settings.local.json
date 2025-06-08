@@ -9,7 +9,9 @@
       "Bash(openssl rand:*)",
       "Bash(npm run setup:admin:*)",
       "Bash(npm run lint)",
-      "Bash(npm run db:push:*)"
+      "Bash(npm run db:push:*)",
+      "Bash(npm run:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

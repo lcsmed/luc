@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, description, status, priority, projectId } = body
+    const { title, description, columnId, projectId } = body
 
     if (!title?.trim()) {
       return NextResponse.json({ error: "Task title is required" }, { status: 400 })
@@ -29,23 +29,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
-    // Verify project ownership
-    const project = await prisma.project.findFirst({
+    if (!columnId) {
+      return NextResponse.json({ error: "Column ID is required" }, { status: 400 })
+    }
+
+    // Verify project ownership and column belongs to project
+    const column = await prisma.column.findFirst({
       where: {
-        id: projectId,
-        authorId: user.id
+        id: columnId,
+        projectId: projectId,
+        project: {
+          authorId: user.id
+        }
       }
     })
 
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+    if (!column) {
+      return NextResponse.json({ error: "Column not found or unauthorized" }, { status: 404 })
     }
 
-    // Get the next order for the status column
+    // Get the next order for the column
     const lastTask = await prisma.task.findFirst({
       where: {
-        projectId: projectId,
-        status: status || 'TODO'
+        columnId: columnId
       },
       orderBy: {
         order: 'desc'
@@ -56,10 +62,9 @@ export async function POST(request: Request) {
       data: {
         title: title.trim(),
         description: description?.trim() || null,
-        status: status || 'TODO',
-        priority: priority || 'MEDIUM',
         order: lastTask ? lastTask.order + 1 : 0,
-        projectId: projectId
+        projectId: projectId,
+        columnId: columnId
       }
     })
 
