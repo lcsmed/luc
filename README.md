@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# itmol - Personal Blog
 
-## Getting Started
+A minimalist personal blog built with Next.js, featuring a secure admin panel for posting from anywhere in the world.
 
-First, run the development server:
+## Features
+
+- 🚀 Fast, server-rendered blog with Next.js 15
+- 🔐 Secure authentication system
+- ✍️ Markdown editor for easy post creation
+- 📱 Responsive design that works on all devices
+- 🌙 Dark mode support
+- 📝 Draft/publish functionality
+- 🔍 SEO optimized
+
+## Deployment to Vercel
+
+### 1. Push to GitHub
+
+First, create a new repository on GitHub and push your code.
+
+### 2. Set up Vercel Postgres
+
+1. Go to your Vercel dashboard
+2. Navigate to the Storage tab
+3. Create a new Postgres database
+4. Copy the connection string
+
+### 3. Deploy to Vercel
+
+1. Import your GitHub repository to Vercel
+2. Add the following environment variables:
+   - `DATABASE_URL` - Your Vercel Postgres connection string
+   - `NEXTAUTH_URL` - Your production URL (e.g., https://itmol.vercel.app)
+   - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+
+### 4. Initialize Database
+
+After deployment, run these commands in your Vercel project:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run db:push
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 5. Create Admin User
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set these environment variables temporarily in Vercel:
+- `ADMIN_EMAIL` - Your email
+- `ADMIN_PASSWORD` - Your password
+- `ADMIN_NAME` - Your name
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Then run:
+```bash
+npm run setup:admin
+```
 
-## Learn More
+Remove these environment variables after setup for security.
 
-To learn more about Next.js, take a look at the following resources:
+## Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Visit `/login` to access the admin panel
+2. Create new posts using the markdown editor
+3. Toggle between draft and published states
+4. Your posts will appear on the homepage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Local Development
 
-## Deploy on Vercel
+```bash
+# Install dependencies
+npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Set up environment variables
+cp .env.example .env
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Push database schema
+npm run db:push
+
+# Create admin user
+npm run setup:admin
+
+# Start development server
+npm run dev
+```
+
+## Security Notes
+
+- Change the default admin password immediately after setup
+- Keep your `NEXTAUTH_SECRET` secure and never commit it
+- Use strong passwords for your admin account
+- Consider adding additional security measures like rate limiting
+
+## Tech Stack
+
+- **Framework**: Next.js 15
+- **Database**: PostgreSQL (Vercel Postgres)
+- **ORM**: Prisma
+- **Authentication**: NextAuth.js
+- **Styling**: Tailwind CSS
+- **Editor**: MDEditor for React
