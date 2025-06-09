@@ -320,6 +320,32 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
     }
   }
 
+  const handleDeleteProject = async () => {
+    if (!project || !projectId) return
+    
+    const confirmDelete = confirm(
+      `Are you sure you want to delete "${project.name}"? This will permanently delete the project and all its tasks. This action cannot be undone.`
+    )
+    
+    if (!confirmDelete) return
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        router.push('/admin/projects')
+      } else {
+        const error = await response.json()
+        alert(error.error || "Failed to delete project")
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error)
+      alert("Failed to delete project. Please try again.")
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -350,36 +376,53 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
   return (
     <div>
       <div className="mb-8">
-        <div className="flex items-center gap-4">
-          <div 
-            className="w-6 h-6 rounded-full"
-            style={{ backgroundColor: project.color }}
-          />
-          {isEditingName ? (
-            <input
-              type="text"
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-              onBlur={handleRenameProject}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleRenameProject()
-                if (e.key === 'Escape') {
-                  setEditedName(project.name)
-                  setIsEditingName(false)
-                }
-              }}
-              className="text-3xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 outline-none px-1"
-              autoFocus
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-6 h-6 rounded-full"
+              style={{ backgroundColor: project.color }}
             />
-          ) : (
-            <h1 
-              className="text-3xl font-bold cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-              onClick={startEditingName}
-              title="Click to rename"
+            {isEditingName ? (
+              <input
+                type="text"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                onBlur={handleRenameProject}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleRenameProject()
+                  if (e.key === 'Escape') {
+                    setEditedName(project.name)
+                    setIsEditingName(false)
+                  }
+                }}
+                className="text-3xl font-bold bg-transparent border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 outline-none px-1"
+                autoFocus
+              />
+            ) : (
+              <h1 
+                className="text-3xl font-bold cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                onClick={startEditingName}
+                title="Click to rename"
+              >
+                {project.name}
+              </h1>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/projects"
+              className="px-3 py-1.5 text-sm bg-gray-800 text-gray-300 rounded hover:bg-gray-700"
             >
-              {project.name}
-            </h1>
-          )}
+              ← Back to Projects
+            </Link>
+            <button
+              onClick={handleDeleteProject}
+              className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              title="Delete project"
+            >
+              Delete Project
+            </button>
+          </div>
         </div>
         {project.description && (
           <p className="text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>

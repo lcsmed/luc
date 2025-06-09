@@ -119,7 +119,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 flex flex-col">
           <div className="space-y-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
@@ -154,76 +154,78 @@ export default function Sidebar() {
                   + New
                 </Link>
               </div>
-              <DragDropContext onDragEnd={handleProjectDragEnd}>
-                <Droppable droppableId="sidebar-projects">
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className="space-y-2 max-h-64 overflow-y-auto"
-                    >
-                      {projects.map((project, index) => {
-                        const { total, completed } = getTaskProgress(project)
-                        const isProjectActive = pathname === `/admin/projects/${project.id}`
-                        
-                        return (
-                          <Draggable key={project.id} draggableId={project.id} index={index}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`rounded-lg border transition-all ${
-                                  isProjectActive
-                                    ? 'bg-blue-900/20 dark:bg-blue-900/20 border-blue-800 dark:border-blue-800'
-                                    : 'bg-gray-900 dark:bg-gray-900 border-gray-800 dark:border-gray-800 hover:bg-gray-800 dark:hover:bg-gray-800'
-                                } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
-                              >
-                                <div className="flex items-center">
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
-                                    title="Drag to reorder"
-                                  >
-                                    ⋮⋮
-                                  </div>
-                                  <Link
-                                    href={`/admin/projects/${project.id}`}
-                                    className="flex-1 p-3 pl-1"
-                                  >
-                                    <div className="flex items-center justify-between mb-2">
-                                      <div className="flex items-center">
-                                        <div
-                                          className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                                          style={{ backgroundColor: project.color }}
-                                        />
-                                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                          {project.name}
-                                        </span>
-                                      </div>
+              <div className="max-h-96 overflow-y-auto overflow-x-hidden modern-scrollbar">
+                <DragDropContext onDragEnd={handleProjectDragEnd}>
+                  <Droppable droppableId="sidebar-projects">
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="space-y-2"
+                      >
+                        {projects.map((project, index) => {
+                          const { total, completed } = getTaskProgress(project)
+                          const isProjectActive = pathname === `/admin/projects/${project.id}`
+                          
+                          return (
+                            <Draggable key={project.id} draggableId={project.id} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  className={`rounded-lg border transition-all ${
+                                    isProjectActive
+                                      ? 'bg-blue-900/20 dark:bg-blue-900/20 border-blue-800 dark:border-blue-800'
+                                      : 'bg-gray-900 dark:bg-gray-900 border-gray-800 dark:border-gray-800 hover:bg-gray-800 dark:hover:bg-gray-800'
+                                  } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                                >
+                                  <div className="flex items-center">
+                                    <div
+                                      {...provided.dragHandleProps}
+                                      className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+                                      title="Drag to reorder"
+                                    >
+                                      ⋮⋮
                                     </div>
-                                    {total > 0 && (
-                                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                                        <span>{completed}/{total} tasks</span>
-                                        <div className="w-16 bg-gray-800 dark:bg-gray-800 rounded-full h-1.5">
+                                    <Link
+                                      href={`/admin/projects/${project.id}`}
+                                      className="flex-1 p-3 pl-1"
+                                    >
+                                      <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center">
                                           <div
-                                            className="bg-green-500 h-1.5 rounded-full transition-all duration-200"
-                                            style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
+                                            className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                                            style={{ backgroundColor: project.color }}
                                           />
+                                          <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                            {project.name}
+                                          </span>
                                         </div>
                                       </div>
-                                    )}
-                                  </Link>
+                                      {total > 0 && (
+                                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                          <span>{completed}/{total} tasks</span>
+                                          <div className="w-16 bg-gray-800 dark:bg-gray-800 rounded-full h-1.5">
+                                            <div
+                                              className="bg-green-500 h-1.5 rounded-full transition-all duration-200"
+                                              style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                    </Link>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        )
-                      })}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
+                              )}
+                            </Draggable>
+                          )
+                        })}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </div>
             </div>
           )}
         </nav>

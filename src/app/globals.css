@@ -44,3 +44,39 @@ html {
     color: #ffffff;
   }
 }
+
+/* Modern Scrollbar Styles */
+.modern-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(75, 85, 99, 0.8) transparent;
+}
+
+.modern-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(75, 85, 99, 0.6), rgba(55, 65, 81, 0.8));
+  border-radius: 10px;
+  border: 1px solid rgba(31, 41, 55, 0.3);
+  transition: all 0.2s ease;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.8), rgba(75, 85, 99, 0.9));
+  border: 1px solid rgba(55, 65, 81, 0.5);
+  transform: scaleX(1.2);
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.9), rgba(107, 114, 128, 1));
+}
+
+.modern-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}

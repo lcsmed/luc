@@ -11,7 +11,8 @@
       "Bash(npm run lint)",
       "Bash(npm run db:push:*)",
       "Bash(npm run:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git remote add:*)"
     ],
     "deny": []
   }
