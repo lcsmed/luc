@@ -265,7 +265,7 @@ export default function TodayPage() {
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
-                              className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border transition-shadow ${
+                              className={`bg-black dark:bg-black p-6 rounded-lg shadow-sm border transition-shadow ${
                                 snapshot.isDragging ? 'shadow-lg' : ''
                               } ${
                                 isDone ? 'opacity-75' : ''

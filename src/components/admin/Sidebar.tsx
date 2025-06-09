@@ -101,17 +101,17 @@ export default function Sidebar() {
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} lg:static lg:translate-x-0 ${isCollapsed ? 'lg:w-16' : 'lg:w-64'}`}>
+    <div className={`bg-black dark:bg-black border-r border-gray-800 dark:border-gray-800 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} lg:static lg:translate-x-0 ${isCollapsed ? 'lg:w-16' : 'lg:w-64'}`}>
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-800 dark:border-gray-800">
           <div className="flex items-center justify-between">
             {!isCollapsed && (
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Admin Panel</h2>
             )}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-1 rounded-lg hover:bg-gray-900 dark:hover:bg-gray-900 transition-colors"
             >
               {isCollapsed ? '→' : '←'}
             </button>
@@ -129,8 +129,8 @@ export default function Sidebar() {
                   href={item.href}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     isActive
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-blue-900 dark:bg-blue-900 text-blue-300 dark:text-blue-300'
+                      : 'text-gray-300 dark:text-gray-300 hover:bg-gray-900 dark:hover:bg-gray-900'
                   }`}
                 >
                   <span className="text-lg">{item.icon}</span>
@@ -144,7 +144,7 @@ export default function Sidebar() {
           {!isCollapsed && projects.length > 0 && (
             <div className="mt-8">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <h3 className="text-sm font-medium text-gray-400 dark:text-gray-400 uppercase tracking-wider">
                   Projects
                 </h3>
                 <Link
@@ -174,8 +174,8 @@ export default function Sidebar() {
                                 {...provided.draggableProps}
                                 className={`rounded-lg border transition-all ${
                                   isProjectActive
-                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                                    : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                                    ? 'bg-blue-900/20 dark:bg-blue-900/20 border-blue-800 dark:border-blue-800'
+                                    : 'bg-gray-900 dark:bg-gray-900 border-gray-800 dark:border-gray-800 hover:bg-gray-800 dark:hover:bg-gray-800'
                                 } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
                               >
                                 <div className="flex items-center">
@@ -204,7 +204,7 @@ export default function Sidebar() {
                                     {total > 0 && (
                                       <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                                         <span>{completed}/{total} tasks</span>
-                                        <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                                        <div className="w-16 bg-gray-800 dark:bg-gray-800 rounded-full h-1.5">
                                           <div
                                             className="bg-green-500 h-1.5 rounded-full transition-all duration-200"
                                             style={{ width: `${total > 0 ? (completed / total) * 100 : 0}%` }}
@@ -229,7 +229,7 @@ export default function Sidebar() {
         </nav>
 
         {/* User Info */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-800 dark:border-gray-800">
           {!isCollapsed && (
             <div className="flex items-center justify-between">
               <div className="flex items-center">

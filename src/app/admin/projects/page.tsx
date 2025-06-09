@@ -58,7 +58,7 @@ export default async function ProjectsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.length === 0 ? (
             <div className="col-span-full text-center py-12">
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-8">
+              <div className="bg-black dark:bg-black rounded-lg shadow p-8">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   No projects yet
                 </h3>
@@ -87,7 +87,7 @@ export default async function ProjectsPage() {
                   href={`/admin/projects/${project.id}`}
                   className="block"
                 >
-                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow hover:shadow-lg transition-shadow border-l-4"
+                  <div className="bg-black dark:bg-black rounded-lg shadow hover:shadow-lg transition-shadow border-l-4"
                        style={{ borderLeftColor: project.color || '#3b82f6' }}>
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">

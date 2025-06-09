@@ -40,18 +40,18 @@ export default async function AdminDashboard() {
           </Link>
           <Link
             href="/"
-            className="border border-gray-300 dark:border-gray-700 px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="border border-gray-700 dark:border-gray-700 px-4 py-2 rounded hover:bg-gray-900 dark:hover:bg-gray-900"
           >
             View Blog
           </Link>
         </div>
       </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-black dark:bg-black rounded-lg shadow border border-gray-800">
+          <div className="px-6 py-4 border-b border-gray-800 dark:border-gray-800">
             <h2 className="text-xl font-semibold">Your Posts</h2>
           </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-gray-800 dark:divide-gray-800">
             {posts.length === 0 ? (
               <div className="px-6 py-8 text-center text-gray-500">
                 No posts yet. Create your first post!

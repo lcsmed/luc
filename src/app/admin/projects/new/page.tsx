@@ -64,7 +64,7 @@ export default function NewProjectPage() {
           <h1 className="text-3xl font-bold mt-4">Create New Project</h1>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow">
+        <div className="bg-black dark:bg-black rounded-lg shadow">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -76,7 +76,7 @@ export default function NewProjectPage() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
                 placeholder="Enter project name"
               />
             </div>
@@ -90,7 +90,7 @@ export default function NewProjectPage() {
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
                 placeholder="Enter project description (optional)"
               />
             </div>

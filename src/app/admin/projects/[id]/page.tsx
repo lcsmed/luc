@@ -38,11 +38,11 @@ interface Project {
 
 const getColumnBgColor = (index: number) => {
   const colors = [
-    'bg-gray-50 dark:bg-gray-800',
-    'bg-blue-50 dark:bg-blue-900/20',
-    'bg-green-50 dark:bg-green-900/20',
-    'bg-purple-50 dark:bg-purple-900/20',
-    'bg-yellow-50 dark:bg-yellow-900/20'
+    'bg-gray-900 dark:bg-gray-900',
+    'bg-blue-900/30 dark:bg-blue-900/30',
+    'bg-green-900/30 dark:bg-green-900/30',
+    'bg-purple-900/30 dark:bg-purple-900/30',
+    'bg-yellow-900/30 dark:bg-yellow-900/30'
   ]
   return colors[index % colors.length]
 }
@@ -418,7 +418,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                     </h2>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 bg-white dark:bg-gray-700 px-2 py-1 rounded">
+                    <span className="text-sm text-gray-500 bg-gray-800 dark:bg-gray-800 px-2 py-1 rounded">
                       {getTasksByColumn(column.id).length}
                     </span>
                     {project.columns.length > 1 && (
@@ -447,7 +447,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border ${
+                              className={`bg-gray-800 dark:bg-gray-800 p-4 rounded-lg shadow-sm border ${
                                 snapshot.isDragging ? 'shadow-lg' : ''
                               } ${
                                 column.name.toLowerCase() === 'done' || 
@@ -511,20 +511,20 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                 </Droppable>
 
                 {showNewTaskForm === column.id ? (
-                  <div className="mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                  <div className="mt-4 bg-gray-800 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
                     <input
                       type="text"
                       placeholder="Task title"
                       value={newTaskTitle}
                       onChange={(e) => setNewTaskTitle(e.target.value)}
-                      className="w-full p-2 border rounded text-sm mb-2 dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-2 border rounded text-sm mb-2 dark:bg-gray-900 dark:border-gray-600"
                       autoFocus
                     />
                     <textarea
                       placeholder="Description (optional)"
                       value={newTaskDescription}
                       onChange={(e) => setNewTaskDescription(e.target.value)}
-                      className="w-full p-2 border rounded text-sm mb-3 h-20 dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-2 border rounded text-sm mb-3 h-20 dark:bg-gray-900 dark:border-gray-600"
                     />
                     <div className="flex gap-2">
                       <button
@@ -554,7 +554,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
             
             {/* New Column Form */}
             {showNewColumnForm ? (
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+              <div className="bg-gray-900 dark:bg-gray-900 rounded-lg p-4">
                 <h3 className="font-semibold mb-3">New Column</h3>
                 <input
                   type="text"
@@ -568,7 +568,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                       setShowNewColumnForm(false)
                     }
                   }}
-                  className="w-full p-2 border rounded text-sm mb-3 dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full p-2 border rounded text-sm mb-3 dark:bg-gray-900 dark:border-gray-600"
                   autoFocus
                 />
                 <div className="flex gap-2">
@@ -592,7 +592,7 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
             ) : (
               <button
                 onClick={() => setShowNewColumnForm(true)}
-                className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 flex items-center justify-center min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                className="bg-gray-900 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-center min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
               >
                 <span className="text-gray-500 dark:text-gray-400">+ Add Column</span>
               </button>
