@@ -449,10 +449,22 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                               {...provided.dragHandleProps}
                               className={`bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border ${
                                 snapshot.isDragging ? 'shadow-lg' : ''
+                              } ${
+                                column.name.toLowerCase() === 'done' || 
+                                column.name.toLowerCase() === 'completed' ||
+                                column.name.toLowerCase() === 'finished'
+                                  ? 'opacity-75' 
+                                  : ''
                               }`}
                             >
                               <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-medium text-sm">{task.title}</h3>
+                                <h3 className={`font-medium text-sm ${
+                                  column.name.toLowerCase() === 'done' || 
+                                  column.name.toLowerCase() === 'completed' ||
+                                  column.name.toLowerCase() === 'finished'
+                                    ? 'line-through text-gray-500 dark:text-gray-400' 
+                                    : ''
+                                }`}>{task.title}</h3>
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => toggleTodayStatus(task.id, task.isToday)}
@@ -474,7 +486,13 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                                 </div>
                               </div>
                               {task.description && (
-                                <p className="text-gray-600 dark:text-gray-400 text-xs mb-2">
+                                <p className={`text-xs mb-2 ${
+                                  column.name.toLowerCase() === 'done' || 
+                                  column.name.toLowerCase() === 'completed' ||
+                                  column.name.toLowerCase() === 'finished'
+                                    ? 'line-through text-gray-400 dark:text-gray-500' 
+                                    : 'text-gray-600 dark:text-gray-400'
+                                }`}>
                                   {task.description}
                                 </p>
                               )}

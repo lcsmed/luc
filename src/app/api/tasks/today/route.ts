@@ -15,6 +15,7 @@ export async function GET() {
         },
         column: {
           select: {
+            id: true,
             name: true
           }
         }
