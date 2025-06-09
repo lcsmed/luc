@@ -560,6 +560,12 @@ export default function ProjectKanbanPage({ params }: { params: Promise<{ id: st
                       placeholder="Task title"
                       value={newTaskTitle}
                       onChange={(e) => setNewTaskTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleCreateTask(column.id)
+                        }
+                      }}
                       className="w-full p-2 border rounded text-sm mb-2 dark:bg-gray-900 dark:border-gray-600"
                       autoFocus
                     />
